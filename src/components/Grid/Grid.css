@@ -1,0 +1,50 @@
+.box {
+  width: 33%;
+  height: 33%;
+  border: 0.1em solid black;
+  position: absolute;
+}
+
+.grid {
+  width: 25%;
+  top: 10%;
+  left: 37%;
+  position: relative;
+  border: 0.1em solid black;
+}
+
+.grid:after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+
+.h-0 {
+  left: 0%;
+}
+
+.h-1 {
+  left: 33%;
+}
+
+.h-2 {
+  left: 66%;
+  width: 34% !important;
+}
+
+.v-0 {
+  top: 0%;
+}
+
+.v-1 {
+  top: 33%;
+}
+
+.v-2 {
+  top: 66%;
+  height: 34% !important;
+}
+
+svg {
+  width: 100%;
+}
