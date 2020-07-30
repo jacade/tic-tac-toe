@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import Grid from './components/Grid';
-import { GridData, GRID_X, GRID_O, PlayerAtTurn, GridValue, GridRow } from './types';
+import { GridData, GRID_X, GRID_O, PlayerAtTurn, GridValue, GridRow, GRID_EMPTY } from './types';
 
 export interface State {
   data: GridData,
@@ -20,11 +20,15 @@ function App() {
   })
   return (
     <div style={{ height: "100vh" }}>
-      <Grid data={state.data} onBoxClick={(row, col) => setState({
-        ...state,
-        data: makeMove(row, col, state.data, state.turn),
-        turn: flipTurn(state.turn)
-      })} />
+      <Grid data={state.data} onBoxClick={(row, col) => {
+        if (state.data[row][col] === GRID_EMPTY) {
+          setState({
+            ...state,
+            data: makeMove(row, col, state.data, state.turn),
+            turn: flipTurn(state.turn)
+          });
+        }
+      }} />
     </div>
   );
 }
