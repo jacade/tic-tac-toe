@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Grid from './components/Grid';
 import { GridData, GRID_X, GRID_O, PlayerAtTurn, GridValue, GridRow } from './types';
-import { stat } from 'fs';
 
 export interface State {
   data: GridData,
