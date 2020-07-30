@@ -4,6 +4,10 @@ export type GridData = [GridRow, GridRow, GridRow];
 
 export type GridRow = [GridValue, GridValue, GridValue];
 
+export type GridIndex = 0 | 1 | 2;
+
+export type BoxIndex = [GridIndex, GridIndex]
+
 export type GridValue = typeof GRID_X | typeof GRID_O | typeof GRID_EMPTY;
 
 export type PlayerAtTurn = typeof GRID_X | typeof GRID_O;

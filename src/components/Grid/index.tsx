@@ -1,10 +1,10 @@
 import React from "react";
-import { GRID_O, GRID_X, GridData, GridValue } from "../../types";
+import { GRID_O, GRID_X, GridData, GridValue, GridIndex, BoxIndex } from "../../types";
 import "./Grid.css";
 
 interface Props {
   data: GridData,
-  onBoxClick?: (row: number, col: number) => void
+  onBoxClick?: (box: BoxIndex) => void
 }
 
 const drawX = () => (<>
@@ -20,17 +20,17 @@ const valueToDisplay = (value: GridValue) => (<svg viewBox="0, 0, 50, 50">
   {drawGraphic(value)}
 </svg>);
 
-const makeBox = (i: number, j: number, value: GridValue, onBoxClick?: (row: number, col: number) => void) => (
+const makeBox = (i: GridIndex, j: GridIndex, value: GridValue, onBoxClick?: (box: BoxIndex) => void) => (
   <div key={`${i}${j}`}
     className={`box h-${j} v-${i}`}
-    onClick={() => typeof onBoxClick !== "undefined" && onBoxClick(i, j)}>
+    onClick={() => typeof onBoxClick !== "undefined" && onBoxClick([i, j])}>
     {valueToDisplay(value)}
   </div>
 );
 
 const Grid: React.FC<Props> = ({ data, onBoxClick }) => (
   <div className="grid">
-    {data.map((row, i) => row.map((value, j) => makeBox(i, j, value, onBoxClick)))}
+    {data.map((row, i) => row.map((value, j) => makeBox(i as GridIndex, j as GridIndex, value, onBoxClick)))}
   </div>
 );
 
