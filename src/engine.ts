@@ -43,15 +43,31 @@ const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
     return center;
   }
   let max = 0;
-  let nextMove: BoxIndex = emptyBoxes[Math.floor(Math.random() * emptyBoxes.length)];
+  let nextMoves: BoxIndex[] = [];
   for (const box of emptyBoxes) {
     const m = vectors.map(v => v.filter(triple => getBoxesWithBox(triple, box).length > 0)).filter(v => v.length > 0).flat().filter(boxes => getSumOfBoxes(boxes, data) > 0).length;
     if (m > max) {
       max = m;
-      nextMove = box;
+      nextMoves = [box];
+    } else if (m === max) {
+      nextMoves.push(box);
     }
   }
-  return nextMove;
+  if (nextMoves.length === 1) {
+    return nextMoves[0];
+  }
+  max = 0;
+  let nextSmartMoves: BoxIndex[] = [];
+  for (const move of nextMoves) {
+    const m = vectors.map(v => v.filter(triple => getBoxesWithBox(triple, move).length > 0)).filter(v => v.length > 0).flat().filter(boxes => getSumOfBoxes(boxes, data) < 0).length;
+    if (m > max) {
+      max = m;
+      nextSmartMoves = [move];
+    } else if (m === max) {
+      nextSmartMoves.push(move);
+    }
+  }
+  return nextSmartMoves[Math.floor(Math.random() * nextSmartMoves.length)];
 }
 
 export default makeEngineMove;
