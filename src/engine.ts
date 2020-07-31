@@ -13,6 +13,7 @@ const intersectBoxes: (boxes1: BoxIndex[], boxes2: BoxIndex[]) => BoxIndex[] =
 const getBoxesWithBox: (boxes: BoxIndex[], box: BoxIndex) => BoxIndex[] = (boxes, box) => intersectBoxes([box], boxes);
 const indexes: GridIndex[] = [0, 1, 2];
 const getEmptyBoxes = (data: GridData) => indexes.flatMap<BoxIndex>(v => indexes.map<BoxIndex>(w => [v, w])).filter(box => data[box[0]][box[1]] === GRID_EMPTY);
+const getVectorsWithSumEqualsValue = (data: GridData, compareValue: number) => vectors.flat().filter(v => getSumOfBoxes(v, data) === compareValue)
 
 const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
   const
@@ -20,19 +21,13 @@ const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
   if (emptyBoxes.length === 0) {
     throw new Error("No empty Boxes left!");
   }
-  for (const set of vectors) { // checks if engine can win
-    for (const vector of set) {
-      if (getSumOfBoxes(vector, data) === -2) {
-        return intersectBoxes(vector, emptyBoxes)[0];
-      }
-    }
+  // checks if engine can win
+  for (const vector of getVectorsWithSumEqualsValue(data, -2)) {
+    return intersectBoxes(vector, emptyBoxes)[0];
   }
-  for (const set of vectors) { // prevents player from winning next turn
-    for (const vector of set) {
-      if (getSumOfBoxes(vector, data) === 2) {
-        return intersectBoxes(vector, emptyBoxes)[0];
-      }
-    }
+  // prevents player from winning next turn
+  for (const vector of getVectorsWithSumEqualsValue(data, 2)) {
+      return intersectBoxes(vector, emptyBoxes)[0];
   }
   if (emptyBoxes.filter(box => isSameBox(box, center)).length > 0) { // take center if available
     return center;
