@@ -12,7 +12,7 @@ const intersectBoxes: (boxes1: BoxIndex[], boxes2: BoxIndex[]) => BoxIndex[] =
   (boxes1, boxes2) => boxes1.filter(box1 => boxes2.some(box2 => isSameBox(box1, box2)));
 const getBoxesWithBox: (boxes: BoxIndex[], box: BoxIndex) => BoxIndex[] = (boxes, box) => intersectBoxes([box], boxes);
 const indexes: GridIndex[] = [0, 1, 2];
-const getEmptyBoxes = (data: GridData) => indexes.map<BoxIndex[]>(v => indexes.map<BoxIndex>(w => [v, w])).flat().filter(box => data[box[0]][box[1]] === GRID_EMPTY);
+const getEmptyBoxes = (data: GridData) => indexes.flatMap<BoxIndex>(v => indexes.map<BoxIndex>(w => [v, w])).filter(box => data[box[0]][box[1]] === GRID_EMPTY);
 
 const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
   const
