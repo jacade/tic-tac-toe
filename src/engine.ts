@@ -1,4 +1,4 @@
-import { GridData, BoxIndex, GRID_EMPTY, GridIndex } from "./types";
+import { GridData, BoxIndex, GRID_EMPTY, GridIndex, PlayerAtTurn, GRID_X, GRID_O } from "./types";
 
 const rows: BoxIndex[][] = [[[0, 0], [0, 1], [0, 2]], [[1, 0], [1, 1], [1, 2]], [[2, 0], [2, 1], [2, 2]]];
 const columns: BoxIndex[][] = [[[0, 0], [1, 0], [2, 0]], [[0, 1], [1, 1], [2, 1]], [[0, 2], [1, 2], [2, 2]]];
@@ -13,7 +13,10 @@ const intersectBoxes: (boxes1: BoxIndex[], boxes2: BoxIndex[]) => BoxIndex[] =
 const isBoxContainedInBoxes = (box: BoxIndex) => (boxes: BoxIndex[]) => intersectBoxes([box], boxes).length > 0;
 const indexes: GridIndex[] = [0, 1, 2];
 const getEmptyBoxes = (data: GridData) => indexes.flatMap<BoxIndex>(v => indexes.map<BoxIndex>(w => [v, w])).filter(box => data[box[0]][box[1]] === GRID_EMPTY);
-const getVectorsWithSumEqualsValue = (data: GridData, compareValue: number) => vectors.filter(v => getSumOfBoxes(v, data) === compareValue)
+const getVectorsWithSumEqualsValue = (data: GridData, compareValue: number) => vectors.filter(v => getSumOfBoxes(v, data) === compareValue);
+const getCrossingVectors = (box: BoxIndex) => vectors.filter(isBoxContainedInBoxes(box));
+const getImportantBoxes = (boxes: BoxIndex[][], data: GridData, forPlayer: PlayerAtTurn) => boxes.filter(b => getSumOfBoxes(b, data) * forPlayer > 0);
+const countImportantCrossings = (box: BoxIndex, data: GridData, forPlayer: PlayerAtTurn) => getImportantBoxes(getCrossingVectors(box), data, forPlayer).length;
 
 const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
   const
@@ -28,35 +31,17 @@ const makeEngineMove: (data: GridData) => BoxIndex = (data) => {
   // prevents player from winning next turn
   for (const vector of getVectorsWithSumEqualsValue(data, 2)) {
     return intersectBoxes(vector, emptyBoxes)[0];
-  }
-  if (emptyBoxes.filter(box => isSameBox(box, center)).length > 0) { // take center if available
+  } 
+  // take center if available
+  if (emptyBoxes.filter(box => isSameBox(box, center)).length > 0) {
     return center;
   }
-  let max = 0;
-  let nextMoves: BoxIndex[] = [];
-  for (const box of emptyBoxes) {
-    const m = vectors.filter(isBoxContainedInBoxes(box)).filter(boxes => getSumOfBoxes(boxes, data) > 0).length;
-    if (m > max) {
-      max = m;
-      nextMoves = [box];
-    } else if (m === max) {
-      nextMoves.push(box);
-    }
-  }
-  if (nextMoves.length === 1) {
-    return nextMoves[0];
-  }
-  max = 0;
-  let nextSmartMoves: BoxIndex[] = [];
-  for (const move of nextMoves) {
-    const m = vectors.filter(isBoxContainedInBoxes(move)).filter(boxes => getSumOfBoxes(boxes, data) < 0).length;
-    if (m > max) {
-      max = m;
-      nextSmartMoves = [move];
-    } else if (m === max) {
-      nextSmartMoves.push(move);
-    }
-  }
+  // find move with maximal crossing out of opponents possibilities
+  let max = Math.max(...emptyBoxes.map(box => countImportantCrossings(box, data, GRID_X)));
+  const nextMoves: BoxIndex[] = emptyBoxes.filter(box => countImportantCrossings(box, data, GRID_X) === max);
+  // find move with maximal increasing of own chances
+  max = Math.max(...nextMoves.map(box => countImportantCrossings(box, data, GRID_O)));
+  const nextSmartMoves: BoxIndex[] = nextMoves.filter(box => countImportantCrossings(box, data, GRID_O) === max);
   return nextSmartMoves[Math.floor(Math.random() * nextSmartMoves.length)];
 }
 
